@@ -5,6 +5,15 @@ Using the `movie_data.csv` which contains text summaries of ~42K movies scraped 
 - What words are characteristic of the movie summaries in those genres
 - Do we see evidence of [Zipf’s law](https://simple.wikipedia.org/wiki/Zipf%27s_law) in the summaries
 
+## Dependencies
+
+Code is written in Python3 and uses the following libraries:
+- Pandas
+
+## How to run
+
+From the command line (in an environment with the dependencies listed above) run:
+
 ## Database properties
 
 The database has the following properties for all movies:
