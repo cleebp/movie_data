@@ -1,6 +1,6 @@
 # Movie Data
 
-Using the `movie_dataset.csv` which contains text summaries of ~42K movies scraped from wikipedia, this project seeks to answer the following questions:
+Using the `movie_data.csv` which contains text summaries of ~42K movies scraped from wikipedia, this project seeks to answer the following questions:
 - What are the 5 most popular genres?
 - What words are characteristic of the movie summaries in those genres
 - Do we see evidence of [Zipf’s law](https://simple.wikipedia.org/wiki/Zipf%27s_law) in the summaries
