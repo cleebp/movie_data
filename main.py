@@ -4,9 +4,12 @@ main.py
 @author: Brian Clee
 @date: 2/14/18
 
-@purpose:
+@purpose: Take the movie_data.csv and answer the following questions: 
+	1) What are the 5 most popular genres?
+	2) What words are characteristic of the movie summaries in those genres
+	3) Do we see evidence of Zipf’s law in the summaries
 @requirements: Python3.4, pandas, numpy, nltk (and data, see readme)
-@arguments: 
+@arguments: movie_data.csv
 """
 
 # imports
@@ -18,7 +21,8 @@ from nltk.tokenize import sent_tokenize, word_tokenize
 
 # @function: main
 # @purpose: driver function that reads in the dataset and calls all other functions
-# @note: normally I would put this last but I moved it to the top for readability, its still called on the last line of the file
+# @note: normally I would put this last but I moved it to the top for readability, its still called on the last line
+#   of the file, the inner C programmer in me is kind of appalled by this...
 def main():
 	# check to make sure our dataset was passed in, graceful exit if it wasn't
 	if len(sys.argv) is not 2:
@@ -36,8 +40,14 @@ def main():
 
 # @function: top_genres
 # @purpose: Figure out what the top 5 most popular genres are in our dataset
+# @param: dataset csv as a pandas dataframe object
+# @return: a list with the top 5 genres in descending order
 def top_genres(data):
-	# code goes here
-	print("huzzah!")
+	# read through csv and store genre as a key in a dict and its value is the count in the csv
+	# if genre not in genre_dict: add it and make value 1
+	# if it is, find it and increment its value by 1
+	# once finished with entire dataset sort the dict by values descending
+	# return top 5 genres in a list
+	genre_dict = {}
 
 main()
