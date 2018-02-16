@@ -8,11 +8,15 @@ Using the `movie_data.csv` which contains text summaries of ~42K movies scraped 
 ## Dependencies
 
 Code is written in Python3 and uses the following libraries:
-- Pandas
+- pandas
+- numpy (for pandas)
+- nltk: you must have both the nltk package and all its [data installed](http://www.nltk.org/data.html)
 
 ## How to run
 
-From the command line (in an environment with the dependencies listed above) run:
+From the command line (in an environment with the dependencies listed above) run and provide `main.py` with the `movie_data.csv` as:  
+
+`python3 main.py movie_data.csv`
 
 ## Database properties
 
