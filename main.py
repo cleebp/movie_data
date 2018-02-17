@@ -69,54 +69,79 @@ def top_genres(data):
 # @param: (sorted_genres) sorted list of genres in descending order of popularity (we only care about the top 5)
 # @param: (data) movie_data.csv as a pandas dataframe object
 def genre_properties(sorted_genres, data):
+	# create empty genre_tokens dict to hold genre:token lists
 	genre_tokens = {}
+	# boolean check to see if we have already gone through and tokenized everything
 	files_exist = os.path.isfile("data/top_genres.txt")
 
-	# initialize this before anything
+	# initialize the genre_tokens keys outside of the if statement so that it can be used in both cases
 	for i in range(0,5):
+		# keys are simply the top 5 genres
 		genre_tokens[sorted_genres[i]] = []
 
+	# if for some reason the data files don't exist, lets go through the process of creating them (takes ~3 minutes)
 	if not files_exist:
-		print("the files don't exist!")
-		t1 = time.time()
+		print("The data files don't exist, beginning tokenization process, grab some coffee...")
+
+		# grab the nltk corpus stopwords
 		stopWords = set(stopwords.words('english'))
+		# add in some extra noise words we don't care about (I definitely missed a couple)
 		noiseWords = ["{{Expand section}}", ",", ".", "(", "[", "{", ")", "]", "}", ":", ";", "&", "'", '"', "'s",
 						"``", "''", "n't"]
 
+		# store the start time so we can keep track of how long this process takes
+		t1 = time.time()
+
+		# iterate through the dataset, this is largerly the same structure as in top_genres so I won't repeat comments
 		for row in data.itertuples(index=True):
+			# strip the genre string of quotes and brackets
 			genre_str = str(getattr(row, 'genres'))
 			genre_str = genre_str[1:-1]
 			genre_str = genre_str.replace('"', '')
 
 			# don't need to do any trimming on summary strings like we did for genre strings
 			summary_str = str(getattr(row, 'summary'))
+			# tokenize the summary string
 			tokens_raw = word_tokenize(summary_str)
+			# create an empty token list we will fill with filtered tokens
 			tokens_processed = []
+			# filter the raw token list
 			for word in tokens_raw:
+				# we only care about words not in the stopWords or noiseWords list
 				if word not in stopWords and word not in noiseWords:
 					tokens_processed.append(word)
 
-			#print(tokens_processed)
+			# for each of the film's genres...
 			for genre in genre_str.split(', '):
+				# if the genre is in the top 5 genres genre_tokens dict...
 				if genre in genre_tokens:
+					# then extend the filtered tokens to the end of genre_token's value pair for the current genre
 					genre_tokens.get(genre).extend(tokens_processed)
 
+		# grab the stop time and alert the user of progress
 		t2 = time.time()
-		# took me 171 seconds to run
-		print("That took a whopping: " + str(t2-t1) + " seconds!")
+		print("Tokenization completed in " + str(t2-t1) + " seconds.")
 
-		# to make sure we never have to do that again, lets store each genre_tokens token lists in a file
+		# to make sure we never have to do that again, lets store all of our data in some .txt files
+		# first lets store the top 5 genres in the file "top_genres.txt", one genre per line
 		top_genres_file = open("data/top_genres.txt", "w")
 		for i in range(0, 5):
+			# grab the genre name
 			genre = sorted_genres[i]
+			# write it to a line with a newline break
 			top_genres_file.write("%s\n" % genre)
+			# using that genre name create a file "genre.txt" where we will store all of that genre's tokens list
 			genre_file = open("data/%s.txt" % genre, "w")
+			# for all of the tokens in that genres value pair from our genre_tokens dict...
 			for token in genre_tokens.get(genre):
+				# write each token on a newline
 				genre_file.write("%s\n" % token)
+			# close our genre file inside the for loop since we will use the same variable for all 5 genre files
 			genre_file.close()
+		# finally close the top_genres file
 		top_genres_file.close()
 
-	# the files do exist (which they should, so lets not bother with that time consuming process
+	# in this case the data files already exist and we don't need to do any tokenization, this should be the normal case
 	else:
 		print("\nThe data files exist, beginning token loading:")
 		top_genres_file = open("data/top_genres.txt", "r")
