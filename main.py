@@ -14,14 +14,15 @@ main.py
 
 # imports
 import sys
+import time
+import os.path
 import pandas as pd
-import numpy as np
-#import nltk
-from nltk.tokenize import sent_tokenize, word_tokenize
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
 
 # @function: top_genres
 # @purpose: Figure out what the top 5 most popular genres are in our dataset
-# @param: dataset csv as a pandas dataframe object
+# @param: (data) movie_data.csv as a pandas dataframe object
 # @return: a list with the genres sorted in descending order by count
 def top_genres(data):
 	# first create an empty dictionary we will populate with key:values as genre:count
@@ -62,9 +63,58 @@ def top_genres(data):
 
 # @function: genre_properties
 # @purpose: Find out what words are characteristic of the movie summaries in the top genres
-# @param: sorted list of genres in descending order of popularity (we only care about the top 5)
-def genre_properties(sorted_genres):
-	print(sorted_genres)
+# @param: (sorted_genres) sorted list of genres in descending order of popularity (we only care about the top 5)
+# @param: (data) movie_data.csv as a pandas dataframe object
+def genre_properties(sorted_genres, data):
+	# for each of the top 5 genres...
+	#   go through the dataset, if the current film has any of the top 5 genres in its genre tag...
+	#     for each of the genres it does have in its tag, add its summary tokens to a data structure, maybe a dict
+	#     {genre: tokens list} (append the new tokens)
+	# once we have a ton of tokens for each genre, go through each of the genres and report on the most frequent tokens
+	# that arent noise words (dont even include these)
+	genre_tokens = {}
+	files_exist = os.path.isfile("top_genres.txt")
+
+	for i in range(0,5):
+		genre_tokens[sorted_genres[i]] = []
+
+	# noise tokens: {{Expand section}}, other more normal -noise tokens
+	stopWords = set(stopwords.words('english'))
+	noiseWords = ["{{Expand section}}", ",", ".", "(", "[", "{", ")", "]", "}", ":", ";", "&", "'", '"', "'s",
+					"``", "''", "n't"]
+
+	if not files_exist:
+		t1 = time.time()
+		for row in data.itertuples(index=True):
+			genre_str = str(getattr(row, 'genres'))
+			genre_str = genre_str[1:-1]
+			genre_str = genre_str.replace('"', '')
+
+			# don't need to do any trimming on summary strings like we did for genre strings
+			summary_str = str(getattr(row, 'summary'))
+			tokens_raw = word_tokenize(summary_str)
+			tokens_processed = []
+			for word in tokens_raw:
+				if word not in stopWords and word not in noiseWords:
+					tokens_processed.append(word)
+
+			#print(tokens_processed)
+			for genre in genre_str.split(', '):
+				if genre in genre_tokens:
+					genre_tokens.get(genre).extend(tokens_processed)
+
+		t2 = time.time()
+		print("That took a whopping: " + str(t2-t1) + " seconds!")
+
+		# to make sure we never have to do that again, lets store each genre_tokens token lists in a file
+		top_genres_file = open("top_genres.txt", "w")
+		for i in range(0, 5):
+			genre = sorted_genres[i]
+			top_genres_file.write("%s\n" % genre)
+			genre_file = open("%s.txt" % genre, "w")
+			for token in genre_tokens.get(genre):
+				genre_file.write("%s\n" % token)
+
 
 # @function: main
 # @purpose: driver function that reads in the dataset and calls all other functions
@@ -84,6 +134,6 @@ def main():
 	sorted_genres = top_genres(data)
 
 	# with the sorted genres list lets find out what properties are associated with the top genres summaries
-	genre_properties(sorted_genres)
+	genre_properties(sorted_genres, data)
 
 main()
