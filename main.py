@@ -44,10 +44,34 @@ def main():
 # @return: a list with the top 5 genres in descending order
 def top_genres(data):
 	# read through csv and store genre as a key in a dict and its value is the count in the csv
-	# if genre not in genre_dict: add it and make value 1
-	# if it is, find it and increment its value by 1
+	# if genre not in genre_dict: add it and make value 1 > if genre_dict.has_key(genre) > genre_dict[genre] = 1
+	# if it is, find it and increment its value by 1 > genre_dict[genre] = genre_dict.get(genre) + 1
 	# once finished with entire dataset sort the dict by values descending
 	# return top 5 genres in a list
 	genre_dict = {}
+	for row in data.itertuples(index=True):
+		"""
+			dev notes: current implementation results in: 
+				genres: ["Children's/Family", "Children's", "Animal Picture", "Family-Oriented Adventure", "Adventure", "Family Film"]
+				genre: [
+				genre: "
+				genre: C
+				...
+			obviously there are a couple issues..
+			- cant parse the individual list items, its seeing the entire thing as a string no matter what i try
+			> might have to do some nltk here to get around this (say something like tokens are "..", then check the genre_dict for tokens)
+
+		"""
+		print("\n=== new row ===")
+		print("row: " + str(row))
+		print("genres: " + str(getattr(row, 'genres')))
+		genre_list = list(getattr(row, 'genres'))
+		for genre in genre_list:
+			print("genre: " + str(genre))
+			if genre in genre_dict:
+				genre_dict[genre] = genre_dict.get(genre) + 1
+			else:
+				genre_dict[genre] = 1
+	print(genre_dict)
 
 main()
