@@ -41,21 +41,39 @@ def main():
 # @function: top_genres
 # @purpose: Figure out what the top 5 most popular genres are in our dataset
 # @param: dataset csv as a pandas dataframe object
-# @return: a list with the top 5 genres in descending order
+# @return: a list with the genres sorted in descending order by count
 def top_genres(data):
+	# first create an empty dictionary we will populate with key:values as genre:count
 	genre_dict = {}
+
+	# loop through the given pandas dataframe, use itertuples to retain the dtypes
 	for row in data.itertuples(index=True):
+		# grab the current row's genres cell and store it in genre_str
 		genre_str = str(getattr(row, 'genres'))
+		# each genre list begins..ends with [..], lets trim those off
 		genre_str = genre_str[1:-1]
+		# each genre is also encapsulated in quotes like "genre", lets find and replace those pesky quotes
 		genre_str = genre_str.replace('"', '')
+		
+		# we now have a nicely formatted list of genres, lets split that string on commas and loop through each genre
 		for genre in genre_str.split(', '):
+			# if the genre already exists in our dictionary...
 			if genre in genre_dict:
+				# ... find and increment its count
 				genre_dict[genre] = genre_dict.get(genre) + 1
+			# if the genre doesnt exist in our dictionary...
 			else:
+				# add it to the dictionary and initialize its count at 1
 				genre_dict[genre] = 1
 
+	# we now have an unsorted dict of genres:counts, lets sort it using sorted (returns a list of genres descending)
 	sorted_genres = sorted(genre_dict, key=genre_dict.get, reverse=True)
 	for i in range(0,5):
-		print(str(sorted_genres[i]) + ": " + str(genre_dict[sorted_genres[i]]))
+		# grab the i'th genre from the sorted_genres list
+		genre = sorted_genres[i]
+		# find that genre's count from the genre_dict dictionary
+		count = genre_dict.get(genre)
+		# print out the genre and its count (i+1 for readability of top 5 since lists start at 0)
+		print(str(i+1) + ". " + str(genre) + ": " + str(count))
 
 main()
