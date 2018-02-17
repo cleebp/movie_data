@@ -20,6 +20,8 @@ import os.path
 import pandas as pd
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
+from nltk.probability import FreqDist
+import matplotlib
 
 # @function: top_genres
 # @purpose: Figure out what the top 5 most popular genres are in our dataset
@@ -132,10 +134,30 @@ def genre_properties(sorted_genres, data):
 		print("Done loading!\n")
 
 	# at this point, whether the files existed before or not, we have our genre_tokens populated with summary tokens
-	print(len(genre_tokens.get("Comedy")))
+	print("Action tokens: " + str(len(genre_tokens.get("Action"))))
+	# freqDist of action tokens
+	fdist = FreqDist(genre_tokens.get("Action"))
+	fdist.plot(50, cumulative=True)
 
+	print("Comedy tokens: " + str(len(genre_tokens.get("Comedy"))))
+	# freqDist of comedy tokens
+	fdist = FreqDist(genre_tokens.get("Comedy"))
+	fdist.plot(50, cumulative=True)
 
+	print("Drama tokens: " + str(len(genre_tokens.get("Drama"))))
+	# freqDist of drama tokens
+	fdist = FreqDist(genre_tokens.get("Drama"))
+	fdist.plot(50, cumulative=True)
 
+	print("Romance Film tokens: " + str(len(genre_tokens.get("Romance Film"))))
+	# freqDist of Romance Film tokens
+	fdist = FreqDist(genre_tokens.get("Romance Film"))
+	fdist.plot(50, cumulative=True)
+
+	print("Thriller tokens: " + str(len(genre_tokens.get("Thriller"))))
+	# freqDist of Thrillertokens
+	fdist = FreqDist(genre_tokens.get("Thriller"))
+	fdist.plot(50, cumulative=True)
 
 # @function: main
 # @purpose: driver function that reads in the dataset and calls all other functions
