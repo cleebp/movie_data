@@ -19,25 +19,6 @@ import numpy as np
 #import nltk
 from nltk.tokenize import sent_tokenize, word_tokenize
 
-# @function: main
-# @purpose: driver function that reads in the dataset and calls all other functions
-# @note: normally I would put this last but I moved it to the top for readability, its still called on the last line
-#   of the file, the inner C programmer in me is kind of appalled by this...
-def main():
-	# check to make sure our dataset was passed in, graceful exit if it wasn't
-	if len(sys.argv) is not 2:
-		print("Error. Please provide this script with the movie dataset as an argument:")
-		print("python3 main.py movie_data.csv")
-		sys.exit(0)
-
-	# take the argument and assume its our dataset (this should have more validation checking in the future)
-	data = sys.argv[1]
-	# read the dataset with pandas and overwrite the old variable to save space
-	data = pd.read_csv(data)
-
-	# now that we have our data, lets answer that first question...
-	top_genres(data)
-
 # @function: top_genres
 # @purpose: Figure out what the top 5 most popular genres are in our dataset
 # @param: dataset csv as a pandas dataframe object
@@ -54,7 +35,7 @@ def top_genres(data):
 		genre_str = genre_str[1:-1]
 		# each genre is also encapsulated in quotes like "genre", lets find and replace those pesky quotes
 		genre_str = genre_str.replace('"', '')
-		
+
 		# we now have a nicely formatted list of genres, lets split that string on commas and loop through each genre
 		for genre in genre_str.split(', '):
 			# if the genre already exists in our dictionary...
@@ -75,5 +56,34 @@ def top_genres(data):
 		count = genre_dict.get(genre)
 		# print out the genre and its count (i+1 for readability of top 5 since lists start at 0)
 		print(str(i+1) + ". " + str(genre) + ": " + str(count))
+
+	# return the list to be used elsewhere, counts aren't needed anymore so no need to return the genre_dict
+	return sorted_genres
+
+# @function: genre_properties
+# @purpose: Find out what words are characteristic of the movie summaries in the top genres
+# @param: sorted list of genres in descending order of popularity (we only care about the top 5)
+def genre_properties(sorted_genres):
+	print(sorted_genres)
+
+# @function: main
+# @purpose: driver function that reads in the dataset and calls all other functions
+def main():
+	# check to make sure our dataset was passed in, graceful exit if it wasn't
+	if len(sys.argv) is not 2:
+		print("Error. Please provide this script with the movie dataset as an argument:")
+		print("python3 main.py movie_data.csv")
+		sys.exit(0)
+
+	# take the argument and assume its our dataset (this should have more validation checking in the future)
+	data = sys.argv[1]
+	# read the dataset with pandas and overwrite the old variable to save space
+	data = pd.read_csv(data)
+
+	# now that we have our data, lets get a list of the top genres sorted descending
+	sorted_genres = top_genres(data)
+
+	# with the sorted genres list lets find out what properties are associated with the top genres summaries
+	genre_properties(sorted_genres)
 
 main()
