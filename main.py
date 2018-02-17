@@ -124,6 +124,7 @@ def genre_properties(sorted_genres, data):
 
 		# to make sure we never have to do that again, lets store all of our data in some .txt files
 		# first lets store the top 5 genres in the file "top_genres.txt", one genre per line
+		# theoretically this step isn't necessary, but if our corpus changes the top 5 genres could change as well
 		top_genres_file = open("data/top_genres.txt", "w")
 		for i in range(0, 5):
 			# grab the genre name
@@ -144,18 +145,34 @@ def genre_properties(sorted_genres, data):
 	# in this case the data files already exist and we don't need to do any tokenization, this should be the normal case
 	else:
 		print("\nThe data files exist, beginning token loading:")
+		# first open the file with the top 5 genres listed
 		top_genres_file = open("data/top_genres.txt", "r")
+
+		# iterate over each line in the file
 		for index, line in enumerate(top_genres_file):
+			# initialize the genre_tokens dict with the top 5 genres as keys, and empty lists for tokesn as values
 			genre_tokens[sorted_genres[index]] = []
+
+		# close the top genres file for memory
 		top_genres_file.close()
 
+		# iterate over each of the genre keys in our genre_tokens dict that we just loaded
 		for genre in genre_tokens:
 			print("Loading the " + str(genre) + ".txt file...")
+			# open the associated file for each genre
 			genre_file = open("data/%s.txt" % genre, "r")
+
+			# iterate over each line of the file
 			for index, line in enumerate(genre_file):
+				# trim the new line characters from the line
 				trimmed_line = line.replace("\n", "")
+				# append the line (token) to the corresponding token list for the current genre in our genre_tokens dict
 				genre_tokens.get(genre).append(trimmed_line)
+
+			# again close our files
 			genre_file.close()
+			
+		# we are now done loading in our data files and can proceed with addressing the problem
 		print("Done loading!\n")
 
 	# at this point, whether the files existed before or not, we have our genre_tokens populated with summary tokens
