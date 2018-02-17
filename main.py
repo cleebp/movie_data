@@ -9,7 +9,8 @@ main.py
 	2) What words are characteristic of the movie summaries in those genres
 	3) Do we see evidence of Zipf’s law in the summaries
 @requirements: Python3.4, pandas, numpy, nltk (and data, see readme)
-@arguments: movie_data.csv
+@arguments: data/movie_data.csv
+@run: python3 main.py data/movie_data.csv
 """
 
 # imports
@@ -66,25 +67,20 @@ def top_genres(data):
 # @param: (sorted_genres) sorted list of genres in descending order of popularity (we only care about the top 5)
 # @param: (data) movie_data.csv as a pandas dataframe object
 def genre_properties(sorted_genres, data):
-	# for each of the top 5 genres...
-	#   go through the dataset, if the current film has any of the top 5 genres in its genre tag...
-	#     for each of the genres it does have in its tag, add its summary tokens to a data structure, maybe a dict
-	#     {genre: tokens list} (append the new tokens)
-	# once we have a ton of tokens for each genre, go through each of the genres and report on the most frequent tokens
-	# that arent noise words (dont even include these)
 	genre_tokens = {}
-	files_exist = os.path.isfile("top_genres.txt")
+	files_exist = os.path.isfile("data/top_genres.txt")
 
+	# initialize this before anything
 	for i in range(0,5):
 		genre_tokens[sorted_genres[i]] = []
 
-	# noise tokens: {{Expand section}}, other more normal -noise tokens
-	stopWords = set(stopwords.words('english'))
-	noiseWords = ["{{Expand section}}", ",", ".", "(", "[", "{", ")", "]", "}", ":", ";", "&", "'", '"', "'s",
-					"``", "''", "n't"]
-
 	if not files_exist:
+		print("the files don't exist!")
 		t1 = time.time()
+		stopWords = set(stopwords.words('english'))
+		noiseWords = ["{{Expand section}}", ",", ".", "(", "[", "{", ")", "]", "}", ":", ";", "&", "'", '"', "'s",
+						"``", "''", "n't"]
+
 		for row in data.itertuples(index=True):
 			genre_str = str(getattr(row, 'genres'))
 			genre_str = genre_str[1:-1]
@@ -104,16 +100,41 @@ def genre_properties(sorted_genres, data):
 					genre_tokens.get(genre).extend(tokens_processed)
 
 		t2 = time.time()
+		# took me 171 seconds to run
 		print("That took a whopping: " + str(t2-t1) + " seconds!")
 
 		# to make sure we never have to do that again, lets store each genre_tokens token lists in a file
-		top_genres_file = open("top_genres.txt", "w")
+		top_genres_file = open("data/top_genres.txt", "w")
 		for i in range(0, 5):
 			genre = sorted_genres[i]
 			top_genres_file.write("%s\n" % genre)
-			genre_file = open("%s.txt" % genre, "w")
+			genre_file = open("data/%s.txt" % genre, "w")
 			for token in genre_tokens.get(genre):
 				genre_file.write("%s\n" % token)
+			genre_file.close()
+		top_genres_file.close()
+
+	# the files do exist (which they should, so lets not bother with that time consuming process
+	else:
+		print("\nThe data files exist, beginning token loading:")
+		top_genres_file = open("data/top_genres.txt", "r")
+		for index, line in enumerate(top_genres_file):
+			genre_tokens[sorted_genres[index]] = []
+		top_genres_file.close()
+
+		for genre in genre_tokens:
+			print("Loading the " + str(genre) + ".txt file...")
+			genre_file = open("data/%s.txt" % genre, "r")
+			for index, line in enumerate(genre_file):
+				trimmed_line = line.replace("\n", "")
+				genre_tokens.get(genre).append(trimmed_line)
+			genre_file.close()
+		print("Done loading!\n")
+
+	# at this point, whether the files existed before or not, we have our genre_tokens populated with summary tokens
+	print(len(genre_tokens.get("Comedy")))
+
+
 
 
 # @function: main

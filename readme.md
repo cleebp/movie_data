@@ -16,7 +16,7 @@ Code is written in Python3 and uses the following libraries:
 
 From the command line (in an environment with the dependencies listed above) run and provide `main.py` with the `movie_data.csv` as:  
 
-`python3 main.py movie_data.csv`
+`python3 main.py data/movie_data.csv`
 
 ## Database properties
 
