@@ -53,6 +53,7 @@ def top_genres(data):
 
 	# we now have an unsorted dict of genres:counts, lets sort it using sorted (returns a list of genres descending)
 	sorted_genres = sorted(genre_dict, key=genre_dict.get, reverse=True)
+	print("The top 5 genres in the movie_data.csv dataset are:")
 	for i in range(0,5):
 		# grab the i'th genre from the sorted_genres list
 		genre = sorted_genres[i]
@@ -175,58 +176,91 @@ def genre_properties(sorted_genres, data):
 		# we are now done loading in our data files and can proceed with addressing the genre characterization
 		print("Done loading!\n")
 
-	# encapsulate all these plot creations in a loop, have the loop only run if the plots don't exists...
-
+	# lets create a dict genre_fdicts that will store the genre:freq dist pairs for each genre
 	genre_fdists = {}
+	print("Creating frequency distributions for each genre:")
+	# for each of our top genres
 	for genre in genre_tokens.keys():
-		print(str(genre) + " tokens: " + str(len(genre_tokens.get(genre))))
+		# print out the genre and number of tokens it has
+		print("Total " + str(genre) + " tokens to consider: " + str(len(genre_tokens.get(genre))) + "...")
+		# calculate the Frequency Distribution of all the genres tokens
 		fdist = FreqDist(genre_tokens.get(genre))
-
-		fig_path = str("plots/%s_fdist.png" % genre)
-		if not os.path.isfile(fig_path):
-			print(str(genre) + " FreqDist plot does not exist, creating and displaying it now...")
-			print("To skip this process in the future, save the figure as `plots/Genre Name_fdist`")
-			fdist.plot(50, cumulative=True)
-
+		# add the genre:freqdist pair to our genre_fdists dict
 		genre_fdists[genre] = fdist
 
-	# list of common words in sorted order
-	common_set = []
+		# next lets do some plotting of the top 50 most frequent tokens
+		fig_path = str("plots/%s_fdist.png" % genre)
+		# we only want to handle plotting if for some reason the plots don't exist
+		if not os.path.isfile(fig_path):
+			# alert the user of what's happening since matplotlib allows the user to specify bounds through a GUI
+			print(str(genre) + " FreqDist plot does not exist, creating and displaying it now...")
+			# alert the user of how to save the plot so this process is no longer run
+			print("To skip this process in the future, save the figure as `plots/Genre Name_fdist`")
+			# plot the top 50 freq dist samples
+			fdist.plot(50, cumulative=True)
 
+	print("Done calculating frequency distributions!\n")
+
+	# now that we have the freq dists for each genre, lets do some more analytics
+	# to begin lets find & store the common set of tokens that is shared between all genre's top 50 freq dist samples
+	common_set = []
+	print("Finding the common set of words in the top 50 samples across all genre frequency distributions...")
+	# loop through the genres starting with the second (this logic is explained below)
 	for i in range(1,5):
+		# grab the current genre from our sorted_genres list that was passed into this function
 		genre = sorted_genres[i]
+		# find the top 50 most common samples in our current genres freq dist
 		top_current = genre_fdists[genre].most_common(50)
+		# initialize an empty temporary list that will overwrite our common_set list
 		new_commons = []
 
-		print(genre)
-
-		# special case where common_set doesn't exist yet, so we just compare the first two freq_dists together
+		# special case where common_set doesn't exist yet, so we must compare the first two freq dists together
 		if i is 1:
+			# grab the previous genres name
 			prev_genre = sorted_genres[i-1]
+			# find its top 50 most common samples from its freq dist
 			top_prev_raw = genre_fdists[prev_genre].most_common(50)
+			# since the most_common function returns a tuple (sample, count) i go ahead and strip out just the sample
 			top_prev_filtered = []
+			# for all the sample tuples...
 			for sample in top_prev_raw:
+				# grab just the sample name
 				top_prev_filtered.append(sample[0])
 
-			# list comprehension to create a shared set list between current and previous genre's fdists
-
+			# for all the sample tuples
 			for sample in top_current:
-				#new_list = [sample for sample in prev_genre if sample[0] is key]
-				#print(new_list)
+				# if the current sample name was in the top 50 sample names from the previous genre...
 				if sample[0] in top_prev_filtered:
+					# then add it to the new_commons list
 					new_commons.append(sample[0])
 
-		# normal case where common_set exists, compare current genre's freq_dist against common set
+		# normal case where common_set exists, compare current genre's freq_dist against the common_set
 		else:
+			# for all the sample tuples...
 			for sample in top_current:
+				# if the current sample name is in the shared common_set list...
 				if sample[0] in common_set:
+					# then add it to the new_commons list
 					new_commons.append(sample[0])
 
+		# replace the common_set with the new_commons list
 		common_set = new_commons
 
+	print("A common set has been found! Across all genres " + str(len(common_set)) + " words are shared, they are:")
 	print(common_set)
-	
+
 	# then for each genre list the top unique words
+	print("\nThe unique words in each genre's top 50 frequency distributions are:")
+	for genre in genre_tokens.keys():
+		unique_set = []
+		top_current = genre_fdists[genre].most_common(50)
+
+		for sample in top_current:
+			if sample[0] not in common_set:
+				unique_set.append(sample[0])
+
+		print("Unique set for " + str(genre) + ": " + str(unique_set))
+
 
 # @function: main
 # @purpose: driver function that reads in the dataset and calls all other functions
