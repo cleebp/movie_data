@@ -190,10 +190,42 @@ def genre_properties(sorted_genres, data):
 
 		genre_fdists[genre] = fdist
 
-	for genre in genre_fdists.keys():
+	# list of common words in sorted order
+	common_set = []
 
+	for i in range(1,5):
+		genre = sorted_genres[i]
+		top_current = genre_fdists[genre].most_common(50)
+		new_commons = []
 
-	# find the common set of words within the top 50 fdist lists between genres, list the top common words set
+		print(genre)
+
+		# special case where common_set doesn't exist yet, so we just compare the first two freq_dists together
+		if i is 1:
+			prev_genre = sorted_genres[i-1]
+			top_prev_raw = genre_fdists[prev_genre].most_common(50)
+			top_prev_filtered = []
+			for sample in top_prev_raw:
+				top_prev_filtered.append(sample[0])
+
+			# list comprehension to create a shared set list between current and previous genre's fdists
+
+			for sample in top_current:
+				#new_list = [sample for sample in prev_genre if sample[0] is key]
+				#print(new_list)
+				if sample[0] in top_prev_filtered:
+					new_commons.append(sample[0])
+
+		# normal case where common_set exists, compare current genre's freq_dist against common set
+		else:
+			for sample in top_current:
+				if sample[0] in common_set:
+					new_commons.append(sample[0])
+
+		common_set = new_commons
+
+	print(common_set)
+	
 	# then for each genre list the top unique words
 
 # @function: main
