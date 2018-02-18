@@ -171,35 +171,30 @@ def genre_properties(sorted_genres, data):
 
 			# again close our files
 			genre_file.close()
-			
-		# we are now done loading in our data files and can proceed with addressing the problem
+
+		# we are now done loading in our data files and can proceed with addressing the genre characterization
 		print("Done loading!\n")
 
-	# at this point, whether the files existed before or not, we have our genre_tokens populated with summary tokens
-	print("Action tokens: " + str(len(genre_tokens.get("Action"))))
-	# freqDist of action tokens
-	fdist = FreqDist(genre_tokens.get("Action"))
-	fdist.plot(50, cumulative=True)
+	# encapsulate all these plot creations in a loop, have the loop only run if the plots don't exists...
 
-	print("Comedy tokens: " + str(len(genre_tokens.get("Comedy"))))
-	# freqDist of comedy tokens
-	fdist = FreqDist(genre_tokens.get("Comedy"))
-	fdist.plot(50, cumulative=True)
+	genre_fdists = {}
+	for genre in genre_tokens.keys():
+		print(str(genre) + " tokens: " + str(len(genre_tokens.get(genre))))
+		fdist = FreqDist(genre_tokens.get(genre))
 
-	print("Drama tokens: " + str(len(genre_tokens.get("Drama"))))
-	# freqDist of drama tokens
-	fdist = FreqDist(genre_tokens.get("Drama"))
-	fdist.plot(50, cumulative=True)
+		fig_path = str("plots/%s_fdist.png" % genre)
+		if not os.path.isfile(fig_path):
+			print(str(genre) + " FreqDist plot does not exist, creating and displaying it now...")
+			print("To skip this process in the future, save the figure as `plots/Genre Name_fdist`")
+			fdist.plot(50, cumulative=True)
 
-	print("Romance Film tokens: " + str(len(genre_tokens.get("Romance Film"))))
-	# freqDist of Romance Film tokens
-	fdist = FreqDist(genre_tokens.get("Romance Film"))
-	fdist.plot(50, cumulative=True)
+		genre_fdists[genre] = fdist
 
-	print("Thriller tokens: " + str(len(genre_tokens.get("Thriller"))))
-	# freqDist of Thrillertokens
-	fdist = FreqDist(genre_tokens.get("Thriller"))
-	fdist.plot(50, cumulative=True)
+	for genre in genre_fdists.keys():
+
+
+	# find the common set of words within the top 50 fdist lists between genres, list the top common words set
+	# then for each genre list the top unique words
 
 # @function: main
 # @purpose: driver function that reads in the dataset and calls all other functions
