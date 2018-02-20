@@ -22,7 +22,6 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.probability import FreqDist
 from matplotlib import pyplot as plt
-import numpy as np
 
 # @function: top_genres
 # @purpose: Figure out what the top 5 most popular genres are in our dataset
@@ -332,16 +331,24 @@ def zipfs(data):
 		print("Done loading!\n")
 
 	print("Creating frequency distribution from " + str(len(summary_tokens)) + " summary tokens...")
+	# create the frequency distribution of our summary tokens
 	summary_fdist = FreqDist(summary_tokens)
+	print("Frequency distribution computed!")
 
+	# caclulate the frequency of our summary_fdist by grabbing the values and sorting descending (plot trends downwards)
 	freqs = sorted(summary_fdist.values(), reverse=True)
+	# calculate the ranks via our frequencies
 	ranks = range(1, len(freqs) + 1)
 
-	plt.loglog(ranks, freqs)
-	plt.xlabel('frequency(f)', fontsize=14, fontweight='bold')
-	plt.ylabel('rank(r)', fontsize=14, fontweight='bold')
-	plt.grid(True)
+	print("\nNow plotting the ranks/frequencies of the summary frequency distribution to demonstrate zipfs law...")
+	print("A plot should be displayed shortly, close the plot to finish script execution.")
 
+	# use a loglog plot (log of both axis) from our ranks by freqs
+	plt.loglog(ranks, freqs)
+	plt.xlabel('frequency (f)', fontsize=12, fontweight='bold')
+	plt.ylabel('rank (r)', fontsize=12, fontweight='bold')
+	plt.grid(True)
+	# display the plot
 	plt.show()
 
 # @function: main
@@ -351,7 +358,7 @@ def main():
 	if len(sys.argv) is not 2:
 		print("Error. Please provide this script with the movie dataset as an argument:")
 		print("python3 main.py movie_data.csv")
-		sys.exit(0)
+		sys.exit(1)
 
 	# take the argument and assume its our dataset (this should have more validation checking in the future)
 	data = sys.argv[1]
@@ -359,12 +366,15 @@ def main():
 	data = pd.read_csv(data)
 
 	# now that we have our data, lets get a list of the top genres sorted descending
-	#sorted_genres = top_genres(data)
+	sorted_genres = top_genres(data)
 
 	# with the sorted genres list lets find out what properties are associated with the top genres summaries
-	#genre_properties(sorted_genres, data)
+	genre_properties(sorted_genres, data)
 
 	# finally lets see if the corpus of movie summaries exhibits properties of zipfs law
 	zipfs(data)
+
+	print("\nExiting gracefully...")
+	sys.exit(0)
 
 main()
