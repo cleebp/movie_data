@@ -214,37 +214,31 @@ def genre_properties(sorted_genres, data):
 		# initialize an empty temporary list that will overwrite our common_set list
 		new_commons = []
 
-		# special case where common_set doesn't exist yet, so we must compare the first two freq dists together
-		if i is 1:
-			# grab the previous genres name
-			prev_genre = sorted_genres[i-1]
-			# find its top 50 most common samples from its freq dist
-			top_prev_raw = genre_fdists[prev_genre].most_common(50)
-			# since the most_common function returns a tuple (sample, count) i go ahead and strip out just the sample
-			top_prev_filtered = []
-			# for all the sample tuples...
-			for sample in top_prev_raw:
-				# grab just the sample name
-				top_prev_filtered.append(sample[0])
+		# grab the previous genres name
+		prev_genre = sorted_genres[i - 1]
 
-			# for all the sample tuples
-			for sample in top_current:
-				# if the current sample name was in the top 50 sample names from the previous genre...
-				if sample[0] in top_prev_filtered:
-					# then add it to the new_commons list
-					new_commons.append(sample[0])
+		print("now comparing " + str(genre) + " against " + str(prev_genre))
+		# find its top 50 most common samples from its freq dist
+		top_prev_raw = genre_fdists[prev_genre].most_common(50)
+		# since the most_common function returns a tuple (sample, count) i go ahead and strip out just the sample
+		top_prev_filtered = []
+		# for all the sample tuples...
+		for sample in top_prev_raw:
+			# grab just the sample name
+			top_prev_filtered.append(sample[0])
 
-		# normal case where common_set exists, compare current genre's freq_dist against the common_set
-		else:
-			# for all the sample tuples...
-			for sample in top_current:
-				# if the current sample name is in the shared common_set list...
-				if sample[0] in common_set:
-					# then add it to the new_commons list
-					new_commons.append(sample[0])
+		# for all the sample tuples...
+		for sample in top_current:
+			# if the current sample name was in the top 50 sample names from the previous genre...
+			if sample[0] in top_prev_filtered:
+				# then add it to the new_commons list
+				new_commons.append(sample[0])
 
+		for sample in new_commons:
+			if sample not in common_set:
+				common_set.append(sample)
 		# replace the common_set with the new_commons list
-		common_set = new_commons
+		#common_set = new_commons
 
 	print("A common set has been found! Across all genres " + str(len(common_set)) + " words are shared, they are:")
 	print(common_set)
@@ -261,6 +255,14 @@ def genre_properties(sorted_genres, data):
 
 		print("Unique set for " + str(genre) + ": " + str(unique_set))
 
+# @function: zipfs
+# @purpose: Investigate all of the summaries and see if it exhibits properties of zipfs law
+# @param: (data) movie_data.csv as a pandas dataframe object
+def zipfs(data):
+	# tokenize all summaries and store in a file if it doesn't already exist (stopwords are not* needed for true zipfs)
+	# compute a freq_dist against summary tokens
+	# see if the top 10 or so words follow zipfs law, maybe create a bar chart showing the change across the top words
+	print("huzzuh!")
 
 # @function: main
 # @purpose: driver function that reads in the dataset and calls all other functions
@@ -281,5 +283,8 @@ def main():
 
 	# with the sorted genres list lets find out what properties are associated with the top genres summaries
 	genre_properties(sorted_genres, data)
+	
+	# finally lets see if the corpus of movie summaries exhibits properties of zipfs law
+	zipfs(data)
 
 main()
