@@ -8,7 +8,7 @@ main.py
 	1) What are the 5 most popular genres?
 	2) What words are characteristic of the movie summaries in those genres
 	3) Do we see evidence of Zipf’s law in the summaries
-@requirements: Python3.4, pandas, numpy, nltk (and data, see readme)
+@requirements: Python3.4, pandas, numpy, nltk (and data, see readme), matplotlib
 @arguments: data/movie_data.csv
 @run: python3 main.py data/movie_data.csv
 """
@@ -21,7 +21,8 @@ import pandas as pd
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.probability import FreqDist
-from matplotlib import pyplot
+from matplotlib import pyplot as plt
+import numpy as np
 
 # @function: top_genres
 # @purpose: Figure out what the top 5 most popular genres are in our dataset
@@ -332,16 +333,16 @@ def zipfs(data):
 
 	print("Creating frequency distribution from " + str(len(summary_tokens)) + " summary tokens...")
 	summary_fdist = FreqDist(summary_tokens)
-	#print("The top 10 most common words in the summary token corpus are:")
-	#print(summary_fdict.most_common(10))
 
-	x_axis = range(1, summary_fdist.B() + 1)
-	y_axis = summary_fdist.values()
+	freqs = sorted(summary_fdist.values(), reverse=True)
+	ranks = range(1, len(freqs) + 1)
 
-	pyplot.plot(x_axis, y_axis)
-	pyplot.yscale('log')
-	pyplot.xscale('log')
-	pyplot.show()
+	plt.loglog(ranks, freqs)
+	plt.xlabel('frequency(f)', fontsize=14, fontweight='bold')
+	plt.ylabel('rank(r)', fontsize=14, fontweight='bold')
+	plt.grid(True)
+
+	plt.show()
 
 # @function: main
 # @purpose: driver function that reads in the dataset and calls all other functions
@@ -358,10 +359,10 @@ def main():
 	data = pd.read_csv(data)
 
 	# now that we have our data, lets get a list of the top genres sorted descending
-	sorted_genres = top_genres(data)
+	#sorted_genres = top_genres(data)
 
 	# with the sorted genres list lets find out what properties are associated with the top genres summaries
-	genre_properties(sorted_genres, data)
+	#genre_properties(sorted_genres, data)
 
 	# finally lets see if the corpus of movie summaries exhibits properties of zipfs law
 	zipfs(data)

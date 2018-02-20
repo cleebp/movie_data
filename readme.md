@@ -9,8 +9,9 @@ Using the `movie_data.csv` which contains text summaries of ~42K movies scraped 
 
 Code is written in Python3 and uses the following libraries:
 - pandas
-- numpy (for pandas)
+- numpy (for pandas and plotting)
 - nltk: you must have both the nltk package and all its [data installed](http://www.nltk.org/data.html)
+- matplotlib
 
 ## How to run
 
