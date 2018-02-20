@@ -82,13 +82,13 @@ def genre_properties(sorted_genres, data):
 
 	# if for some reason the data files don't exist, lets go through the process of creating them (takes ~3 minutes)
 	if not files_exist:
-		print("The data files don't exist, beginning tokenization process, grab some coffee...")
+		print("\nThe data files don't exist, beginning tokenization process, grab some coffee...")
 
 		# grab the nltk corpus stopwords
 		stopWords = set(stopwords.words('english'))
 		# add in some extra noise words we don't care about (I definitely missed a couple)
 		noiseWords = ["{{Expand section}}", ",", ".", "(", "[", "{", ")", "]", "}", ":", ";", "&", "'", '"', "'s",
-						"``", "''", "n't"]
+						"``", "''", "n't", "`", '’']
 
 		# store the start time so we can keep track of how long this process takes
 		t1 = time.time()
