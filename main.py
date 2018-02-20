@@ -206,7 +206,7 @@ def genre_properties(sorted_genres, data):
 	common_set = []
 	print("Finding the common set of words in the top 50 samples across all genre frequency distributions...")
 	# loop through the genres starting with the second (this logic is explained below)
-	for i in range(1,5):
+	for i in range(0, 5):
 		# grab the current genre from our sorted_genres list that was passed into this function
 		genre = sorted_genres[i]
 		# find the top 50 most common samples in our current genres freq dist
@@ -214,37 +214,44 @@ def genre_properties(sorted_genres, data):
 		# initialize an empty temporary list that will overwrite our common_set list
 		new_commons = []
 
-		# grab the previous genres name
-		prev_genre = sorted_genres[i - 1]
+		print("now computing common set additions from " + str(genre) + " genre...")
 
-		print("now comparing " + str(genre) + " against " + str(prev_genre))
-		# find its top 50 most common samples from its freq dist
-		top_prev_raw = genre_fdists[prev_genre].most_common(50)
-		# since the most_common function returns a tuple (sample, count) i go ahead and strip out just the sample
-		top_prev_filtered = []
-		# for all the sample tuples...
-		for sample in top_prev_raw:
-			# grab just the sample name
-			top_prev_filtered.append(sample[0])
+		# inner loop to compare each genre against every other genre O(n^2), further work could be done to improve this
+		for j in range(0, 5):
+			# if the genre we are comparing against is the current genre then skip it
+			if j is i:
+				continue
 
-		# for all the sample tuples...
-		for sample in top_current:
-			# if the current sample name was in the top 50 sample names from the previous genre...
-			if sample[0] in top_prev_filtered:
-				# then add it to the new_commons list
-				new_commons.append(sample[0])
+			# grab the genre to compare against's name
+			compare_genre = sorted_genres[j]
+			# grab the compare genre's frequency distribution
+			top_compare_raw = genre_fdists[compare_genre].most_common(50)
+			# since the most_common function returns a tuple (sample, count) lets strip out just the sample
+			top_compare_filtered = []
+			# for all the sample tuples...
+			for sample in top_compare_raw:
+				# grab just the sample name
+				top_compare_filtered.append(sample[0])
 
-		for sample in new_commons:
-			if sample not in common_set:
-				common_set.append(sample)
-		# replace the common_set with the new_commons list
-		#common_set = new_commons
+			# now lets actually compare the current genre's samples against the compare genre's samples
+			for sample in top_current:
+				# if the current sample name is in the top 50 sample names from the compare genre...
+				if sample[0] in top_compare_filtered:
+					# then add it to the new_commons list
+					new_commons.append(sample[0])
+
+			# now we need to update the common_set list with samples that aren't already in it
+			for sample in new_commons:
+				# if the sample from new_commons doesn't exist in the common_set list...
+				if sample not in common_set:
+					# then add the sample to common_set
+					common_set.append(sample)
 
 	print("A common set has been found! Across all genres " + str(len(common_set)) + " words are shared, they are:")
 	print(common_set)
 
 	# then for each genre list the top unique words
-	print("\nThe unique words in each genre's top 50 frequency distributions are:")
+	print("\nThe unique sets for each genre are...")
 	for genre in genre_tokens.keys():
 		unique_set = []
 		top_current = genre_fdists[genre].most_common(50)
@@ -253,7 +260,7 @@ def genre_properties(sorted_genres, data):
 			if sample[0] not in common_set:
 				unique_set.append(sample[0])
 
-		print("Unique set for " + str(genre) + ": " + str(unique_set))
+		print(str(genre) + ": " + str(unique_set))
 
 # @function: zipfs
 # @purpose: Investigate all of the summaries and see if it exhibits properties of zipfs law
@@ -262,6 +269,9 @@ def zipfs(data):
 	# tokenize all summaries and store in a file if it doesn't already exist (stopwords are not* needed for true zipfs)
 	# compute a freq_dist against summary tokens
 	# see if the top 10 or so words follow zipfs law, maybe create a bar chart showing the change across the top words
+
+	# example of a log log graph for zipfs law against a corpus:
+	# https://nlp.stanford.edu/IR-book/html/htmledition/zipfs-law-modeling-the-distribution-of-terms-1.html
 	print("huzzuh!")
 
 # @function: main
@@ -283,7 +293,7 @@ def main():
 
 	# with the sorted genres list lets find out what properties are associated with the top genres summaries
 	genre_properties(sorted_genres, data)
-	
+
 	# finally lets see if the corpus of movie summaries exhibits properties of zipfs law
 	zipfs(data)
 
