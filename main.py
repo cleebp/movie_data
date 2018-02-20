@@ -21,7 +21,7 @@ import pandas as pd
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.probability import FreqDist
-import matplotlib
+from matplotlib import pyplot
 
 # @function: top_genres
 # @purpose: Figure out what the top 5 most popular genres are in our dataset
@@ -331,9 +331,17 @@ def zipfs(data):
 		print("Done loading!\n")
 
 	print("Creating frequency distribution from " + str(len(summary_tokens)) + " summary tokens...")
-	summary_fdict = FreqDist(summary_tokens)
-	print("The top 10 most common words in the summary token corpus are:")
-	print(summary_fdict.most_common(10))
+	summary_fdist = FreqDist(summary_tokens)
+	#print("The top 10 most common words in the summary token corpus are:")
+	#print(summary_fdict.most_common(10))
+
+	x_axis = range(1, summary_fdist.B() + 1)
+	y_axis = summary_fdist.values()
+
+	pyplot.plot(x_axis, y_axis)
+	pyplot.yscale('log')
+	pyplot.xscale('log')
+	pyplot.show()
 
 # @function: main
 # @purpose: driver function that reads in the dataset and calls all other functions
