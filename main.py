@@ -266,29 +266,23 @@ def genre_properties(sorted_genres, data):
 # @purpose: Investigate all of the summaries and see if it exhibits properties of zipfs law
 # @param: (data) movie_data.csv as a pandas dataframe object
 def zipfs(data):
-	# tokenize all summaries and store in a file if it doesn't already exist (stopwords are not* needed for true zipfs)
-	# compute a freq_dist against summary tokens
-	# see if the top 10 or so words follow zipfs law, maybe create a bar chart showing the change across the top words
-
-	# example of a log log graph for zipfs law against a corpus:
-	# https://nlp.stanford.edu/IR-book/html/htmledition/zipfs-law-modeling-the-distribution-of-terms-1.html
-
-	# create empty summary_tokens list to hold all tokens from every summary
+	# create empty summary_tokens list to hold tokens from every summary
 	summary_tokens = []
 	# boolean check to see if we have already gone through and tokenized everything
 	files_exist = os.path.isfile("data/summary_tokens.txt")
 
-	# if for some reason the data files don't exist, lets go through the process of creating them (takes ~3 minutes)
+	# if the data files don't exist, lets go through the process of creating them (takes ~3 minutes)
 	if not files_exist:
 		print("\nThe summary_tokens file doesn't exist, beginning tokenization process, grab some coffee...")
 
 		# store the start time so we can keep track of how long this process takes
 		t1 = time.time()
 
+		# for zipfs law we will take out punctuation, but not stop words
 		noiseWords = ["{{Expand section}}", ",", ".", "(", "[", "{", ")", "]", "}", ":", ";", "&", "'", '"', "'s",
-		              "``", "''", "n't", "`", '’']
+						"``", "''", "n't", "`", '’']
 
-		# iterate through the dataset, this is largerly the same structure as in top_genres so I won't repeat comments
+		# iterate through the dataset, this is largely the same structure as in top_genres so I won't repeat comments
 		for row in data.itertuples(index=True):
 			# grab the summary string for tokenization
 			summary_str = str(getattr(row, 'summary'))
@@ -296,29 +290,31 @@ def zipfs(data):
 			# tokenize the summary string
 			tokens = word_tokenize(summary_str)
 
+			# check to see if the token is in our noiseTokens list...
 			for token in tokens:
-				if not token in noiseWords:
+				# if its not a noise word...
+				if token not in noiseWords:
+					# then add the token to our summary_tokens list
 					summary_tokens.append(token)
-
-			# extend the new tokens to our summary_tokens list
-			#summary_tokens.extend(tokens)
 
 		# grab the stop time and alert the user of progress
 		t2 = time.time()
 		print("Tokenization completed in " + str(t2 - t1) + " seconds.\n")
 
+		# next lets write our summary tokens to the "summary_tokens.txt" file
 		summary_file = open("data/summary_tokens.txt", "w")
-		#
+		# go through each token in the summary_tokens list
 		for token in summary_tokens:
 			# write each token on a newline
 			summary_file.write("%s\n" % token)
-		#
+
+		# close our file for memory
 		summary_file.close()
 
-	# in this case the data files already exist and we don't need to do any tokenization, this should be the normal case
+	# the summary_tokens file already exists and we don't need to do any tokenization, this should be the normal case
 	else:
 		print("\nThe summary_tokens file exists, beginning token loading...")
-		#
+		# open the summary_tokens.txt file
 		summary_file = open("data/summary_tokens.txt", "r")
 
 		# iterate over each line in the file
@@ -331,7 +327,7 @@ def zipfs(data):
 		# close the summary file for memory
 		summary_file.close()
 
-		# we are now done loading in our data files and can proceed with addressing the genre characterization
+		# we are now done loading the summary file and can proceed with addressing zipfs law
 		print("Done loading!\n")
 
 	print("Creating frequency distribution from " + str(len(summary_tokens)) + " summary tokens...")
