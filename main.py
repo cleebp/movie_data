@@ -204,7 +204,7 @@ def genre_properties(sorted_genres, data):
 	# now that we have the freq dists for each genre, lets do some more analytics
 	# to begin lets find & store the common set of tokens that is shared between all genre's top 50 freq dist samples
 	common_set = []
-	print("Finding the common set of words in the top 50 samples across all genre frequency distributions...")
+	print("Finding the common set of words across all genre frequency distributions:")
 	# loop through the genres starting with the second (this logic is explained below)
 	for i in range(0, 5):
 		# grab the current genre from our sorted_genres list that was passed into this function
@@ -214,7 +214,7 @@ def genre_properties(sorted_genres, data):
 		# initialize an empty temporary list that will overwrite our common_set list
 		new_commons = []
 
-		print("now computing common set additions from " + str(genre) + " genre...")
+		print("Now computing common set additions from " + str(genre) + " genre...")
 
 		# inner loop to compare each genre against every other genre O(n^2), further work could be done to improve this
 		for j in range(0, 5):
@@ -251,7 +251,7 @@ def genre_properties(sorted_genres, data):
 	print(common_set)
 
 	# then for each genre list the top unique words
-	print("\nThe unique sets for each genre are...")
+	print("\nComputing the unique sets for each genre...")
 	for genre in genre_tokens.keys():
 		unique_set = []
 		top_current = genre_fdists[genre].most_common(50)
@@ -260,7 +260,7 @@ def genre_properties(sorted_genres, data):
 			if sample[0] not in common_set:
 				unique_set.append(sample[0])
 
-		print(str(genre) + ": " + str(unique_set))
+		print(str(genre) + "'s unique set: " + str(unique_set))
 
 # @function: zipfs
 # @purpose: Investigate all of the summaries and see if it exhibits properties of zipfs law
