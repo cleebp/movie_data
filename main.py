@@ -121,7 +121,7 @@ def genre_properties(sorted_genres, data):
 
 		# grab the stop time and alert the user of progress
 		t2 = time.time()
-		print("Tokenization completed in " + str(t2-t1) + " seconds.")
+		print("Tokenization completed in " + str(t2-t1) + " seconds.\n")
 
 		# to make sure we never have to do that again, lets store all of our data in some .txt files
 		# first lets store the top 5 genres in the file "top_genres.txt", one genre per line
@@ -272,7 +272,72 @@ def zipfs(data):
 
 	# example of a log log graph for zipfs law against a corpus:
 	# https://nlp.stanford.edu/IR-book/html/htmledition/zipfs-law-modeling-the-distribution-of-terms-1.html
-	print("huzzuh!")
+
+	# create empty summary_tokens list to hold all tokens from every summary
+	summary_tokens = []
+	# boolean check to see if we have already gone through and tokenized everything
+	files_exist = os.path.isfile("data/summary_tokens.txt")
+
+	# if for some reason the data files don't exist, lets go through the process of creating them (takes ~3 minutes)
+	if not files_exist:
+		print("\nThe summary_tokens file doesn't exist, beginning tokenization process, grab some coffee...")
+
+		# store the start time so we can keep track of how long this process takes
+		t1 = time.time()
+
+		noiseWords = ["{{Expand section}}", ",", ".", "(", "[", "{", ")", "]", "}", ":", ";", "&", "'", '"', "'s",
+		              "``", "''", "n't", "`", '’']
+
+		# iterate through the dataset, this is largerly the same structure as in top_genres so I won't repeat comments
+		for row in data.itertuples(index=True):
+			# grab the summary string for tokenization
+			summary_str = str(getattr(row, 'summary'))
+
+			# tokenize the summary string
+			tokens = word_tokenize(summary_str)
+
+			for token in tokens:
+				if not token in noiseWords:
+					summary_tokens.append(token)
+
+			# extend the new tokens to our summary_tokens list
+			#summary_tokens.extend(tokens)
+
+		# grab the stop time and alert the user of progress
+		t2 = time.time()
+		print("Tokenization completed in " + str(t2 - t1) + " seconds.\n")
+
+		summary_file = open("data/summary_tokens.txt", "w")
+		#
+		for token in summary_tokens:
+			# write each token on a newline
+			summary_file.write("%s\n" % token)
+		#
+		summary_file.close()
+
+	# in this case the data files already exist and we don't need to do any tokenization, this should be the normal case
+	else:
+		print("\nThe summary_tokens file exists, beginning token loading...")
+		#
+		summary_file = open("data/summary_tokens.txt", "r")
+
+		# iterate over each line in the file
+		for index, line in enumerate(summary_file):
+			# trim the new line characters from the line
+			trimmed_line = line.replace("\n", "")
+			# append the line (token) to the summary_tokens list
+			summary_tokens.append(trimmed_line)
+
+		# close the summary file for memory
+		summary_file.close()
+
+		# we are now done loading in our data files and can proceed with addressing the genre characterization
+		print("Done loading!\n")
+
+	print("Creating frequency distribution from " + str(len(summary_tokens)) + " summary tokens...")
+	summary_fdict = FreqDist(summary_tokens)
+	print("The top 10 most common words in the summary token corpus are:")
+	print(summary_fdict.most_common(10))
 
 # @function: main
 # @purpose: driver function that reads in the dataset and calls all other functions
